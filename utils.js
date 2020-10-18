@@ -125,6 +125,9 @@ const getAFDStates = (AFND, states, language) => {
   return obj
 }
 
+/**
+ * Letras do alfabeto
+ */
 const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 /**
  * Retorna A - Z baseado no índice. Caso o índice esteja fora do alfabeto, retornará Q{n}, n começando de 0
@@ -133,7 +136,7 @@ const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
  */
 const getStateChar = index => {
   return index >= alphabet.length
-    ? 'Q' + index - alphabet.length
+    ? 'Q' + (index - alphabet.length)
     : alphabet.charAt(index)
 }
 
