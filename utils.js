@@ -88,7 +88,7 @@ const getNumericalSet = (AFND) => {
 
   subsets(Object.keys(AFND.states).join(''), '')
 
-  return sortSubsets(arr)
+  return ['', ...sortSubsets(arr)]
 }
 
 /**
@@ -98,10 +98,10 @@ const getNumericalSet = (AFND) => {
  * @param {Array<string>} language Array contendo o(s) caractere(s) da linguagem
  * @return {object}                Objeto contendo os caminhos dados para a linguagem e se é um estado final
  */
-const getAFDStates = (AFND, states, language) => {
+const getAFDStates = (AFND, states, language, subsets) => {
   const possiblePaths = language.map(() => new Set())
 
-  states.forEach(state => {
+  states.split('').forEach(state => {
     AFND.states[state].forEach(_state => {
       language.forEach((char, index) => {
         if (_state.char === char) {
@@ -111,16 +111,20 @@ const getAFDStates = (AFND, states, language) => {
     })
   })
 
+  possiblePaths.forEach(path => console.log(path))
+
   const obj = {
     chars: [],
-    isFinalState: states.some(state => AFND.finalStates.includes(state))
+    isFinalState: states.split('').some(state => AFND.finalStates.includes(state))
   }
 
   language.forEach((char, index) => {
     obj.chars.push({
-      [char]: [...possiblePaths[index]]
+      [char]: getStateChar(subsets.indexOf([...possiblePaths[index]].join('')))
     })
   })
+
+  console.log(obj)
 
   return obj
 }
@@ -153,7 +157,7 @@ const getAFDInfo = (AFND, subsets, language) => {
   const finalStates = new Set()
 
   const states = subsets.map((subset, index) => {
-    const state = getAFDStates(AFND, subset.split(''), language)
+    const state = getAFDStates(AFND, subset, language, subsets)
 
     state.char = getStateChar(index)
 
@@ -169,6 +173,32 @@ const getAFDInfo = (AFND, subsets, language) => {
   }
 }
 
+const removeUnusedStatesPath = AFD => {
+  const initialState = AFD.states.find(state => state.char === AFD.initialState)
+  const states = new Set()
+
+  const recursivePathFinding = state => {
+    states.add(state.char)
+    state.chars.forEach(charSet => {
+      Object.values(charSet).forEach(char => {
+        // console.log(char)
+        char.filter(el => el !== state.char).forEach(el => {
+          recursivePathFinding(AFD.states.find(state => state.char === el))
+        })
+      })
+    })
+  }
+
+  // console.log(initialState)
+  recursivePathFinding(initialState)
+  // console.log(states)
+}
+
+/**
+ * Escreve em um arquivo .txt os estados do AFD
+ * @param {object} AFD  Objeto do Autômato Finito Determinístico
+ * @param {string} path Caminho do arquivo a ser lido
+ */
 const writeAFDFile = async (AFD, path) => {
   const lines = []
 
@@ -183,9 +213,7 @@ const writeAFDFile = async (AFD, path) => {
   AFD.states.forEach(state => {
     state.chars.forEach(char => {
       for(const [key, value] of Object.entries(char)) {
-        value.forEach(val => {
-          lines.push(`${state.char} ${key} ${val}`)
-        })
+        value && lines.push(`${state.char} ${key} ${value}`)
       }
     })
   })
@@ -197,5 +225,6 @@ module.exports = {
   parseAFNDFile,
   getNumericalSet,
   getAFDInfo,
+  removeUnusedStatesPath,
   writeAFDFile
 }

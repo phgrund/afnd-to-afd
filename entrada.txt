@@ -4,6 +4,7 @@ D
 A 0 A
 A 0 B
 A 1 A
+A 2 A
 B 0 C
 B 1 C
 C 0 D
