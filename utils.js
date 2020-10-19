@@ -170,10 +170,20 @@ const getAFDInfo = (AFND, subsets) => {
   }
 }
 
+/**
+ * Chamando uma função recursiva, encontra todos os estados que são utilizados e remove os que não são utilizados
+ * @param {AFD} AFD Objeto do AFD
+ */
 const removeUnusedStatesPath = AFD => {
   const initialState = AFD.states.find(state => state.char === AFD.initialState)
   const states = new Set()
 
+  /**
+   * Encontra os estados utilizados recursivamente
+   * O ponto de parada acontece quando o estado atual já tenha sido passado, controlado pela string 'trace'
+   * @param {Array<object>} state Array contendo os estados
+   * @param {string}        trace String para controlar quais estados já foram passados
+   */
   const recursivePathFinding = (state, trace = '') => {
     states.add(state.char)
     state.chars.forEach(charSet => {
