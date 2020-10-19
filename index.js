@@ -1,8 +1,5 @@
 const { parseAFNDFile, getNumericalSet, getAFDInfo, removeUnusedStatesPath, writeAFDFile } = require('./utils')
 
-const language = ['0', '1']
-const nullState = '2'
-
 const path = 'entrada.txt'
 
 const main = async () => {
@@ -10,18 +7,11 @@ const main = async () => {
 
   const subsets = getNumericalSet(AFND)
 
-  console.log(subsets)
+  const AFD = getAFDInfo(AFND, subsets)
 
-  const AFD = getAFDInfo(AFND, subsets, language)
+  removeUnusedStatesPath(AFD)
 
-  console.log(AFD.initialState)
-
-  AFD.states.forEach(state => {
-    console.log(state.chars)
-    // state.chars.forEach(char => console.log(char))
-  })
-
-  // removeUnusedStatesPath(AFD)
+  console.log(AFD.states)
 
   writeAFDFile(AFD, 'saida.txt')
 }
